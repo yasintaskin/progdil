@@ -241,8 +241,8 @@ namespace :p do #isim uzayında gorev olustur.
       *presentation.sort_by do |k, v|
         File.mtime(v[:directory])
       end
-      .reverse
-      .map { |k, v| [v[:name], k] }
+      .reverse #map islevi ters cevriliyor.
+      .map { |k, v| [v[:name], k] } #map islevi yapılıyor.
       .flatten
     ]
     name = choose do |menu|
