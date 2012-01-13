@@ -253,11 +253,11 @@ namespace :p do #isim uzayında gorev olustur.
       menu.choices(*lookup.keys)
     end
     directory = lookup[name]
-    Rake::Task["#{directory}:run"].invoke
+    Rake::Task["#{directory}:run"].invoke #rake verilen dizin ile calıstırılır.
   end
   task :m => :menu
 end
-
-desc "sunum menüsü"
-task :p => ["p:menu"]
-task :presentation => :p
+ 
+desc "sunum menüsü" 
+task :p => ["p:menu"] #menude p iletisiyle calıstır.
+task :presentation => :p #presentationdan gelen veriyle calıstır.
