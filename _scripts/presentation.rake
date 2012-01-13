@@ -1,8 +1,7 @@
-
 require 'pathname'
 require 'pythonconfig'
 require 'yaml'
-
+# deneme yapıyorum
 CONFIG = Config.fetch('presentation', {})
 
 PRESENTATION_DIR = CONFIG.fetch('directory', 'p')
