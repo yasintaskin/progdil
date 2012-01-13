@@ -13,7 +13,7 @@ TASKS = { #hedef gorevler ve tanımları.
     :index   => 'sunumları indeksle',
     :build   => 'sunumları oluştur',
     :clean   => 'sunumları temizle',
-    :view    => 'sunumları görüntüle',
+    :view    => 'sunumları görüntüle', #gorev acıklamaları yapılmıstır.
     :run     => 'sunumları sun',
     :optim   => 'resimleri iyileştir',
     :default => 'öntanımlı görev',
@@ -23,7 +23,7 @@ presentation   = {}
 tag            = {}
 
 class File # sınıf kullanarak dosya yolunun alınması islemi.  
-  @@absolute_path_here = Pathname.new(Pathname.pwd)
+  @@absolute_path_here = Pathname.new(Pathname.pwd) #dizinin yolu.
   def self.to_herepath(path)
     Pathname.new(File.expand_path(path)).relative_path_from(@@absolute_path_here).to_s
   end
@@ -35,20 +35,20 @@ class File # sınıf kullanarak dosya yolunun alınması islemi.
 end
 
 def png_comment(file, string) # dosya yolundaki stringi yorumlar.
-  require 'chunky_png'
-  require 'oily_png'
+  require 'chunky_png' #chunky png sınıfını cagır.
+  require 'oily_png'   #oily_png sınıfını cagır.
 
-  image = ChunkyPNG::Image.from_file(file)
+  image = ChunkyPNG::Image.from_file(file) #resimler uzerinde duzeltme yapmamızı saglar.
   image.metadata['Comment'] = 'raked' #acılan dosyadaki raked yoorumunu yapmaktadır.
   image.save(file)
 end
 
-def png_optim(file, threshold=40000)
-  return if File.new(file).size < threshold
+def png_optim(file, threshold=40000) #boyutu 4000 den kucuk olan resimler alınacak.
+  return if File.new(file).size < threshold #boyutlandırılıp cıkısa aktarma yapılacak.
   sh "pngnq -f -e .png-nq #{file}"
   out = "#{file}-nq"
-  if File.exist?(out)
-    $?.success? ? File.rename(out, file) : File.delete(out)
+  if File.exist?(out) #File ın cıkısını kontrol et.
+    $?.success? ? File.rename(out, file) : File.delete(out) #duruma bakarak out u silebilirsin.
   end
   png_comment(file, 'raked')
 end
@@ -62,13 +62,13 @@ def optim
   pngs, jpgs = FileList["**/*.png"], FileList["**/*.jpg", "**/*.jpeg"]
 
   [pngs, jpgs].each do |a|
-    a.reject! { |f| %x{identify -format '%c' #{f}} =~ /[Rr]aked/ }
+    a.reject! { |f| %x{identify -format '%c' #{f}} =~ /[Rr]aked/ } #raked olanları listeden cıkar.
   end
 
-  (pngs + jpgs).each do |f|
+  (pngs + jpgs).each do |f| # pngs ve jpgs dosyalarının içerisinde gezinmemizi saglar.
     w, h = %x{identify -format '%[fx:w] %[fx:h]' #{f}}.split.map { |e| e.to_i }
-    size, i = [w, h].each_with_index.max
-    if size > IMAGE_GEOMETRY[i]
+    size, i = [w, h].each_with_index.max #boyutlar kontrol ediliyor.
+    if size > IMAGE_GEOMETRY[i] #boyutlandır.
       arg = (i > 0 ? 'x' : '') + IMAGE_GEOMETRY[i].to_s
       sh "mogrify -resize #{arg} #{f}"
     end
@@ -85,20 +85,20 @@ def optim
   end
 end
 
-default_conffile = File.expand_path(DEFAULT_CONFFILE)
+default_conffile = File.expand_path(DEFAULT_CONFFILE) #dosya yolunu al.
 
-FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir|
+FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir| #dizinin içerisinde [^_.]* ile baslayan karakterler.
   next unless File.directory?(dir)
   chdir dir do
     name = File.basename(dir)
     conffile = File.exists?('presentation.cfg') ? 'presentation.cfg' : default_conffile
-    config = File.open(conffile, "r") do |f|
+    config = File.open(conffile, "r") do |f| #dosya aç içinde dolas.
       PythonConfig::ConfigParser.new(f)
     end
 
-    landslide = config['landslide']
+    landslide = config['landslide'] #congig içerisindeki landslide kısmını al.
     if ! landslide
-      $stderr.puts "#{dir}: 'landslide' bölümü tanımlanmamış"
+      $stderr.puts "#{dir}: 'landslide' bölümü tanımlanmamış" #hata cıkısı olarak burayı goster.
       exit 1
     end
 
@@ -127,9 +127,9 @@ FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir|
       deps += v.split.select { |p| File.exists?(p) }.map { |p| File.to_filelist(p) }.flatten
     end
 
-    deps.map! { |e| File.to_herepath(e) }
-    deps.delete(target)
-    deps.delete(thumbnail)
+    deps.map! { |e| File.to_herepath(e) } #desp içerisinde map islevini yap.
+    deps.delete(target) #target degiskenini sil.
+    deps.delete(thumbnail) #thumbnail degiskenini sil.
 
     tags = []
 
@@ -156,14 +156,14 @@ end
 
 tasktab = Hash[*TASKS.map { |k, v| [k, { :desc => v, :tasks => [] }] }.flatten]
 
-presentation.each do |presentation, data|
+presentation.each do |presentation, data| #presentation icerisinde dolas ve etiketle.
   ns = namespace presentation do
-    file data[:target] => data[:deps] do |t|
+    file data[:target] => data[:deps] do |t| #gorev etiketleri.
       chdir presentation do
-        sh "landslide -i #{data[:conffile]}"
+        sh "landslide -i #{data[:conffile]}" #kabukta landslide -1 dondurur.
         sh 'sed -i -e "s/^\([[:blank:]]*var hiddenContext = \)false\(;[[:blank:]]*$\)/\1true\2/" presentation.html'
         unless data[:basename] == 'presentation.html'
-          mv 'presentation.html', data[:basename]
+          mv 'presentation.html', data[:basename] #presentation.html olarak değistir.
         end
       end
     end
@@ -187,36 +187,36 @@ presentation.each do |presentation, data|
       end
     end
 
-    task :index => data[:thumbnail]
+    task :index => data[:thumbnail] #indeksi calıstır.
 
     task :build => [:optim, data[:target], :index]
 
     task :view do
-      if File.exists?(data[:target])
+      if File.exists?(data[:target]) #var olup olmadıgı kontrol ediliyor.
         sh "touch #{data[:directory]}; #{browse_command data[:target]}"
       else
         $stderr.puts "#{data[:target]} bulunamadı; önce inşa edin"
       end
     end
 
-    task :run => [:build, :view]
+    task :run => [:build, :view] #run ı calıstırmak için build ve view kullanılıyor.
 
     task :clean do
-      rm_f data[:target]
-      rm_f data[:thumbnail]
+      rm_f data[:target] #target siliniyor.
+      rm_f data[:thumbnail] #thumbnail siliniyor.
     end
 
-    task :default => :build
+    task :default => :build #build calıstırıılıyor.
   end
 
-  ns.tasks.map(&:to_s).each do |t|
+  ns.tasks.map(&:to_s).each do |t| #np uzerinde map islevi yap.
     _, _, name = t.partition(":").map(&:to_sym)
     next unless tasktab[name]
     tasktab[name][:tasks] << t
   end
 end
 
-namespace :p do
+namespace :p do #isim uzayında gorev olustur.
   tasktab.each do |name, info|
     desc info[:desc]
     task name => info[:tasks]
@@ -226,11 +226,11 @@ namespace :p do
   task :build do
     index = YAML.load_file(INDEX_FILE) || {}
     presentations = presentation.values.select { |v| v[:public] }.map { |v| v[:directory] }.sort
-    unless index and presentations == index['presentations']
+    unless index and presentations == index['presentations'] #indesk olmazsaq presentation indeks numaralarına esittir.
       index['presentations'] = presentations
       File.open(INDEX_FILE, 'w') do |f|
         f.write(index.to_yaml)
-        f.write("---\n")
+        f.write("---\n") #indeks 1 yaml yapılıp içerisine yazılıyor.
       end
     end
   end
