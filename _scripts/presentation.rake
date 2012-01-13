@@ -7,8 +7,8 @@ PRESENTATION_DIR = CONFIG.fetch('directory', 'p') #sunmak için gerekli olan diz
 DEFAULT_CONFFILE = CONFIG.fetch('conffile', '_templates/presentation.cfg') #on tanımlı olarak ayar yapmak.
 INDEX_FILE = File.join(PRESENTATION_DIR, 'index.html') #dosyada indeksleri olusturmak.
 IMAGE_GEOMETRY = [ 733, 550 ] #resmin boyutları.
-DEPEND_KEYS    = %w(source css js)
-DEPEND_ALWAYS  = %w(media)
+DEPEND_KEYS    = %w(source css js) # baglı olarak anahtarlama.
+DEPEND_ALWAYS  = %w(media) #sürekli gelen bagımlılık.
 TASKS = {
     :index   => 'sunumları indeksle',
     :build   => 'sunumları oluştur',
@@ -22,7 +22,7 @@ TASKS = {
 presentation   = {}
 tag            = {}
 
-class File
+class File # sınıf kullanarak dosya yolunun alınması islemi.  
   @@absolute_path_here = Pathname.new(Pathname.pwd)
   def self.to_herepath(path)
     Pathname.new(File.expand_path(path)).relative_path_from(@@absolute_path_here).to_s
