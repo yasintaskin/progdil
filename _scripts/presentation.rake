@@ -246,9 +246,9 @@ namespace :p do #isim uzayında gorev olustur.
       .flatten
     ]
     name = choose do |menu|
-      menu.default = "1"
+      menu.default = "1" #menu default degiskenini 1 e esitliyor.
       menu.prompt = color(
-        'Lütfen sunum seçin ', :headline
+        'Lütfen sunum seçin ', :headline #kullanıcıya sunumu secme hakkı veriliyor.
       ) + '[' + color("#{menu.default}", :special) + ']'
       menu.choices(*lookup.keys)
     end
