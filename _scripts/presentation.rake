@@ -1,13 +1,12 @@
-require 'pathname'
-require 'pythonconfig'
-require 'yaml'
-# deneme yapıyorum
-CONFIG = Config.fetch('presentation', {})
+require 'pathname' #dosya yolunu yazarak metodu çalıstırmak.
+require 'pythonconfig' #python programını yapılandırmak.
+require 'yaml' #islemek istediğimiz verileri olusturan dosya.
+CONFIG = Config.fetch('presentation', {}) #gerekli yapılandırmalar.
 
-PRESENTATION_DIR = CONFIG.fetch('directory', 'p')
-DEFAULT_CONFFILE = CONFIG.fetch('conffile', '_templates/presentation.cfg')
-INDEX_FILE = File.join(PRESENTATION_DIR, 'index.html')
-IMAGE_GEOMETRY = [ 733, 550 ]
+PRESENTATION_DIR = CONFIG.fetch('directory', 'p') #sunmak için gerekli olan dizin.
+DEFAULT_CONFFILE = CONFIG.fetch('conffile', '_templates/presentation.cfg') #on tanımlı olarak ayar yapmak.
+INDEX_FILE = File.join(PRESENTATION_DIR, 'index.html') #dosyada indeksleri olusturmak.
+IMAGE_GEOMETRY = [ 733, 550 ] #resmin boyutları.
 DEPEND_KEYS    = %w(source css js)
 DEPEND_ALWAYS  = %w(media)
 TASKS = {
