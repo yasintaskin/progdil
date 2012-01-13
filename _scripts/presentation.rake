@@ -9,7 +9,7 @@ INDEX_FILE = File.join(PRESENTATION_DIR, 'index.html') #dosyada indeksleri olust
 IMAGE_GEOMETRY = [ 733, 550 ] #resmin boyutları.
 DEPEND_KEYS    = %w(source css js) # baglı olarak anahtarlama.
 DEPEND_ALWAYS  = %w(media) #sürekli gelen bagımlılık.
-TASKS = {
+TASKS = { #hedef gorevler ve tanımları.
     :index   => 'sunumları indeksle',
     :build   => 'sunumları oluştur',
     :clean   => 'sunumları temizle',
@@ -28,18 +28,18 @@ class File # sınıf kullanarak dosya yolunun alınması islemi.
     Pathname.new(File.expand_path(path)).relative_path_from(@@absolute_path_here).to_s
   end
   def self.to_filelist(path)
-    File.directory?(path) ?
+    File.directory?(path) ? #dosya yolu aynı olan dosyaları listeleme görevi yapar.
       FileList[File.join(path, '*')].select { |f| File.file?(f) } :
       [path]
   end
 end
 
-def png_comment(file, string)
+def png_comment(file, string) # dosya yolundaki stringi yorumlar.
   require 'chunky_png'
   require 'oily_png'
 
   image = ChunkyPNG::Image.from_file(file)
-  image.metadata['Comment'] = 'raked'
+  image.metadata['Comment'] = 'raked' #acılan dosyadaki raked yoorumunu yapmaktadır.
   image.save(file)
 end
 
